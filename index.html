@@ -1569,20 +1569,19 @@
 						</div>
 					</div>
 
-					<!--  🔹 Projects Section  -->
+					<!-- 🔹 Projects Section -->
 					<section id="projects" class="projects-section">
-						<!-- Title (desktop) -->
+						<!-- Titles -->
 						<div class="cards-title elementor-hidden-mobile">
-							<span class="title-area">PROJECTS</span>	
+							<span class="title-area">PROJECTS</span>
 							<h2 class="cards-title-text">Projects</h2>
 						</div>
-						<!-- Title (tablet / mobile) -->
 						<h1
 							class="cards-title-text elementor-heading-title elementor-hidden-desktop elementor-hidden-tablet mb-5">
 							Projects
 						</h1>
 
-						<!-- Horizontal scroller -->
+						<!-- Scroller + arrows -->
 						<div class="horizontal-scrolling-container">
 							<button class="scroll-button left" onclick="scrollCards(-1)">&#8592;</button>
 							<div class="horizontal-scrolling-cards" id="projectCards"></div>
@@ -1630,17 +1629,17 @@
 						.horizontal-scrolling-container {
 							display: flex;
 							align-items: center;
-							/* allow swipe!  */
-							overflow-x: auto;
-							scroll-behavior: smooth;
-							-webkit-overflow-scrolling: touch;
+							position: relative;
 						}
 
 						.horizontal-scrolling-cards {
 							display: flex;
 							gap: 20px;
+							overflow-x: auto;
 							padding: 0 20px;
+							scroll-behavior: smooth;
 							scroll-snap-type: x mandatory;
+							-webkit-overflow-scrolling: touch;
 							flex: 1;
 						}
 
@@ -1648,7 +1647,7 @@
 							display: none;
 						}
 
-						/* optional */
+						/* hide scrollbar */
 
 						/* —— Card —— */
 						.card {
@@ -1737,10 +1736,12 @@
 							}
 
 							.scroll-button {
-								display: none;
+								width: 32px;
+								height: 32px;
+								font-size: 1rem;
 							}
 
-							/* hide arrows, enable full‑width swipe */
+							/* smaller circles on mobile */
 						}
 					</style>
 
@@ -1761,8 +1762,8 @@
 
 						const container = document.getElementById("projectCards");
 
-						/* —— Card builder —— */
-						function createCard(p) {
+						/* —— Build cards —— */
+						projectData.forEach(p => {
 							const card = document.createElement("div");
 							card.className = "card";
 							card.innerHTML = `
@@ -1776,11 +1777,8 @@
         <span class="card-link">View Project</span>
       </div>
     </a>`;
-							return card;
-						}
-
-						/* —— Render cards —— */
-						projectData.forEach(p => container.appendChild(createCard(p)));
+							container.appendChild(card);
+						});
 
 						/* —— Arrow scroll —— */
 						function scrollCards(dir) {
@@ -1791,14 +1789,16 @@
 							container.scrollBy({ left: dir * scrollAmount, behavior: "smooth" });
 						}
 
-						/* Optional: enable wheel‑scroll (shift+wheel or track‑pad) */
-						container.addEventListener("wheel", e => {
+						/* Optional: wheel‑to‑horizontal for desktop users */
+						container.addEventListener('wheel', e => {
 							if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-								container.scrollBy({ left: e.deltaY, behavior: "smooth" });
+								container.scrollBy({ left: e.deltaY, behavior: 'smooth' });
 								e.preventDefault();
 							}
 						}, { passive: false });
 					</script>
+
+
 
 
 					<!-- end of project section  -->
