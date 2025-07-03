@@ -1581,11 +1581,22 @@
 							Projects
 						</h1>
 
-						<!-- Scroller + arrows -->
+						<!-- Scroller + Realar arrows -->
 						<div class="horizontal-scrolling-container">
-							<button class="scroll-button left" onclick="scrollCards(-1)">&#8592;</button>
-							<div class="horizontal-scrolling-cards" id="projectCards"></div>
-							<button class="scroll-button right" onclick="scrollCards(1)">&#8594;</button>
+							<!-- LEFT -->
+							<button data-slider-prev="#aminitiesSlider1" class="slider-arrow slider-prev">
+								<img src="wp-content/plugins/realar-core/assets/img/arrow-left.svg" alt="icon"
+									decoding="async">
+							</button>
+
+							<!-- CARD TRACK -->
+							<div class="horizontal-scrolling-cards" id="aminitiesSlider1"></div>
+
+							<!-- RIGHT -->
+							<button data-slider-next="#aminitiesSlider1" class="slider-arrow slider-next">
+								<img src="wp-content/plugins/realar-core/assets/img/arrow-right.svg" alt="icon"
+									decoding="async">
+							</button>
 						</div>
 					</section>
 
@@ -1604,7 +1615,7 @@
 							z-index: 1;
 						}
 
-						/* —— Titles —— */
+						/* —— Headings —— */
 						.cards-title {
 							text-align: center;
 							margin-bottom: 30px;
@@ -1640,19 +1651,15 @@
 							scroll-behavior: smooth;
 							scroll-snap-type: x mandatory;
 							-webkit-overflow-scrolling: touch;
-							/* iOS momentum */
-							touch-action: pan-x;
-							/* let browser know we scroll horizontally */
 							overscroll-behavior-x: contain;
-							/* prevent page pull‑to‑refresh */
-							padding: 0 20px;
+							touch-action: pan-x;
+							padding: 0 50px;
+							/* extra space for arrows */
 						}
 
 						.horizontal-scrolling-cards::-webkit-scrollbar {
 							display: none;
 						}
-
-						/* hide scrollbar */
 
 						/* —— Card —— */
 						.card {
@@ -1704,13 +1711,12 @@
 							font-weight: 500;
 						}
 
-						/* —— Arrow buttons —— */
-						.scroll-button {
+						/* —— Realar arrows —— */
+						.slider-arrow {
 							position: absolute;
 							top: 50%;
 							transform: translateY(-50%);
 							background: rgba(0, 0, 0, .7);
-							color: #fff;
 							border: none;
 							border-radius: 50%;
 							width: 36px;
@@ -1722,13 +1728,17 @@
 							z-index: 3;
 						}
 
-						.scroll-button.left {
-							left: 0;
+						.slider-prev {
+							left: -20px;
 						}
 
-						.scroll-button.right {
-							right: 0;
+						/* pull slightly outside */
+						.slider-next {
+							right: -18px;
+							display: flex !important;
 						}
+
+						/* force visible */
 
 						/* —— Responsive tweaks —— */
 						@media (max-width:768px) {
@@ -1740,11 +1750,24 @@
 								width: 240px;
 							}
 
-							.scroll-button {
+							.slider-arrow {
 								width: 32px;
 								height: 32px;
-								font-size: 1rem;
 							}
+
+							.slider-prev {
+								left: -16px;
+							}
+
+							.slider-next {
+								right: -16px;
+							}
+
+							.horizontal-scrolling-cards {
+								padding: 0 44px;
+							}
+
+							/* adjust for smaller arrows */
 						}
 					</style>
 
@@ -1763,12 +1786,11 @@
 							{ title: "Apartment Project", text: "RTC X Roads", img: "rtcXroads.png", link: "rtcXroads" }
 						];
 
-						const container = document.getElementById("projectCards");
-
 						/* —— Build cards —— */
+						const track = document.getElementById('aminitiesSlider1');
 						projectData.forEach(p => {
-							const card = document.createElement("div");
-							card.className = "card";
+							const card = document.createElement('div');
+							card.className = 'card';
 							card.innerHTML = `
     <a href="./${p.link}/index.html">
       <div class="card-icon">
@@ -1780,40 +1802,43 @@
         <span class="card-link">View Project</span>
       </div>
     </a>`;
-							container.appendChild(card);
+							track.appendChild(card);
 						});
 
-						/* —— Arrow scroll —— */
-						function scrollCards(dir) {
-							const card = container.querySelector('.card');
-							if (!card) return;
-							const gap = parseInt(getComputedStyle(container).gap) || 20;
-							const scrollAmount = card.offsetWidth + gap;
-							container.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+						/* —— Arrow controls —— */
+						function scrollTrack(dir) {
+							const cardW = track.querySelector('.card')?.offsetWidth || 250;
+							const gap = parseInt(getComputedStyle(track).gap) || 20;
+							track.scrollBy({ left: (cardW + gap) * dir, behavior: 'smooth' });
 						}
+						document.querySelector('[data-slider-prev="#aminitiesSlider1"]')
+							.addEventListener('click', () => scrollTrack(-1));
+						document.querySelector('[data-slider-next="#aminitiesSlider1"]')
+							.addEventListener('click', () => scrollTrack(1));
 
-						/* —— Pointer‑drag fallback (works everywhere) —— */
-						let isDown = false, startX, scrollStart;
-						container.addEventListener('pointerdown', e => {
-							isDown = true; startX = e.pageX; scrollStart = container.scrollLeft;
-							container.setPointerCapture(e.pointerId);
-						});
-						container.addEventListener('pointermove', e => {
-							if (!isDown) return;
-							const dx = e.pageX - startX;
-							container.scrollLeft = scrollStart - dx;
-						});
-						container.addEventListener('pointerup', () => isDown = false);
-						container.addEventListener('pointercancel', () => isDown = false);
+						/* —— Touch‑drag fallback —— */
+						let sX, sL, drag = false;
+						track.addEventListener('touchstart', e => {
+							drag = true; sX = e.touches[0].pageX; sL = track.scrollLeft;
+						}, { passive: true });
+						track.addEventListener('touchmove', e => {
+							if (!drag) return;
+							const dx = e.touches[0].pageX - sX;
+							track.scrollLeft = sL - dx;
+						}, { passive: true });
+						track.addEventListener('touchend', () => drag = false);
+						track.addEventListener('touchcancel', () => drag = false);
 
-						/* Optional: wheel‑to‑horizontal for desktop users */
-						container.addEventListener('wheel', e => {
+						/* —— Wheel → horizontal for desktop —— */
+						track.addEventListener('wheel', e => {
 							if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-								container.scrollBy({ left: e.deltaY, behavior: 'smooth' });
+								track.scrollBy({ left: e.deltaY, behavior: 'smooth' });
 								e.preventDefault();
 							}
 						}, { passive: false });
 					</script>
+
+
 
 
 
@@ -2156,8 +2181,8 @@
 															</div>
 														</a></div>
 												</div>
-												<div class="slider-pagination"></div><button
-													data-slider-prev="#aminitiesSlider1"
+												<div class="slider-pagination"></div>
+												<button data-slider-prev="#aminitiesSlider1"
 													class="slider-arrow slider-prev"><img decoding="async"
 														src="wp-content/plugins/realar-core/assets/img/arrow-left.svg"
 														alt="icon"></button><button data-slider-next="#aminitiesSlider1"
