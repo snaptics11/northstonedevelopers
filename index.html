@@ -1635,12 +1635,17 @@
 						.horizontal-scrolling-cards {
 							display: flex;
 							gap: 20px;
+							flex: 1;
 							overflow-x: auto;
-							padding: 0 20px;
 							scroll-behavior: smooth;
 							scroll-snap-type: x mandatory;
 							-webkit-overflow-scrolling: touch;
-							flex: 1;
+							/* iOS momentum */
+							touch-action: pan-x;
+							/* let browser know we scroll horizontally */
+							overscroll-behavior-x: contain;
+							/* prevent page pull‑to‑refresh */
+							padding: 0 20px;
 						}
 
 						.horizontal-scrolling-cards::-webkit-scrollbar {
@@ -1740,8 +1745,6 @@
 								height: 32px;
 								font-size: 1rem;
 							}
-
-							/* smaller circles on mobile */
 						}
 					</style>
 
@@ -1782,12 +1785,26 @@
 
 						/* —— Arrow scroll —— */
 						function scrollCards(dir) {
-							const card = container.querySelector(".card");
+							const card = container.querySelector('.card');
 							if (!card) return;
 							const gap = parseInt(getComputedStyle(container).gap) || 20;
 							const scrollAmount = card.offsetWidth + gap;
-							container.scrollBy({ left: dir * scrollAmount, behavior: "smooth" });
+							container.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
 						}
+
+						/* —— Pointer‑drag fallback (works everywhere) —— */
+						let isDown = false, startX, scrollStart;
+						container.addEventListener('pointerdown', e => {
+							isDown = true; startX = e.pageX; scrollStart = container.scrollLeft;
+							container.setPointerCapture(e.pointerId);
+						});
+						container.addEventListener('pointermove', e => {
+							if (!isDown) return;
+							const dx = e.pageX - startX;
+							container.scrollLeft = scrollStart - dx;
+						});
+						container.addEventListener('pointerup', () => isDown = false);
+						container.addEventListener('pointercancel', () => isDown = false);
 
 						/* Optional: wheel‑to‑horizontal for desktop users */
 						container.addEventListener('wheel', e => {
@@ -1797,6 +1814,7 @@
 							}
 						}, { passive: false });
 					</script>
+
 
 
 
