@@ -1569,16 +1569,20 @@
 						</div>
 					</div>
 
-					<!-- Projects Section -->
+					<!--  🔹 Projects Section  -->
 					<section id="projects" class="projects-section">
+						<!-- Title (desktop) -->
 						<div class="cards-title elementor-hidden-mobile">
-							<span class="title-area ">PROJECTS</span>
+							<span class="title-area">PROJECTS</span>	
 							<h2 class="cards-title-text">Projects</h2>
 						</div>
+						<!-- Title (tablet / mobile) -->
 						<h1
 							class="cards-title-text elementor-heading-title elementor-hidden-desktop elementor-hidden-tablet mb-5">
-							Projects</h1>
+							Projects
+						</h1>
 
+						<!-- Horizontal scroller -->
 						<div class="horizontal-scrolling-container">
 							<button class="scroll-button left" onclick="scrollCards(-1)">&#8592;</button>
 							<div class="horizontal-scrolling-cards" id="projectCards"></div>
@@ -1587,10 +1591,11 @@
 					</section>
 
 					<style>
+						/* —— General —— */
 						body {
 							margin: 0;
 							padding: 0;
-							background-color: #0e1c2e;
+							background: #0e1c2e;
 							font-family: sans-serif;
 						}
 
@@ -1600,17 +1605,17 @@
 							z-index: 1;
 						}
 
+						/* —— Titles —— */
 						.cards-title {
 							text-align: center;
 							margin-bottom: 30px;
-							position: relative;
 						}
 
 						.title-area {
 							display: block;
 							font-size: 1rem;
 							color: #aaa;
-							opacity: 0.6;
+							opacity: .6;
 							letter-spacing: 2px;
 						}
 
@@ -1621,39 +1626,39 @@
 							text-transform: uppercase;
 						}
 
+						/* —— Scroller —— */
 						.horizontal-scrolling-container {
 							display: flex;
 							align-items: center;
-							overflow: hidden;
-							position: relative;
-							width: 100%;
+							/* allow swipe!  */
+							overflow-x: auto;
+							scroll-behavior: smooth;
+							-webkit-overflow-scrolling: touch;
 						}
 
 						.horizontal-scrolling-cards {
 							display: flex;
 							gap: 20px;
-							overflow-x: auto !important;
-							scroll-snap-type: x mandatory;
-							scroll-behavior: smooth;
 							padding: 0 20px;
+							scroll-snap-type: x mandatory;
 							flex: 1;
-							scrollbar-width: none;
-							touch-action: pan-x;
-							-webkit-overflow-scrolling: touch;
 						}
 
 						.horizontal-scrolling-cards::-webkit-scrollbar {
 							display: none;
 						}
 
+						/* optional */
+
+						/* —— Card —— */
 						.card {
 							flex: 0 0 auto;
 							width: 280px;
 							background: #0e1c2e;
 							border-radius: 10px;
 							scroll-snap-align: start;
-							box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-							transition: transform 0.3s;
+							box-shadow: 0 4px 10px rgba(0, 0, 0, .3);
+							transition: transform .3s;
 						}
 
 						.card:hover {
@@ -1695,12 +1700,13 @@
 							font-weight: 500;
 						}
 
+						/* —— Arrow buttons —— */
 						.scroll-button {
 							position: absolute;
 							top: 50%;
 							transform: translateY(-50%);
-							background-color: rgba(0, 0, 0, 0.7);
-							color: white;
+							background: rgba(0, 0, 0, .7);
+							color: #fff;
 							border: none;
 							border-radius: 50%;
 							width: 36px;
@@ -1720,7 +1726,8 @@
 							right: 0;
 						}
 
-						@media (max-width: 768px) {
+						/* —— Responsive tweaks —— */
+						@media (max-width:768px) {
 							.cards-title-text {
 								font-size: 1.5rem;
 							}
@@ -1730,14 +1737,15 @@
 							}
 
 							.scroll-button {
-								width: 32px;
-								height: 32px;
-								font-size: 1rem;
+								display: none;
 							}
+
+							/* hide arrows, enable full‑width swipe */
 						}
 					</style>
 
 					<script>
+						/* —— Project data —— */
 						const projectData = [
 							{ title: "Naandhi Villa Project", text: "Commercial & Apartment – Vijayawada", img: "vijayawada.png", link: "vijayawada" },
 							{ title: "Commercial Project", text: "Located in HITEC City", img: "hitech-city.png", link: "hitech-city" },
@@ -1753,33 +1761,45 @@
 
 						const container = document.getElementById("projectCards");
 
-						function createCard(project) {
+						/* —— Card builder —— */
+						function createCard(p) {
 							const card = document.createElement("div");
 							card.className = "card";
 							card.innerHTML = `
-      <a href="./${project.link}/index.html">
-        <div class="card-icon">
-          <img src="./wp-content/uploads/2024/07/projects/${project.img}" alt="${project.title}">
-        </div>
-        <div class="card-content">
-          <h3 class="card-title">${project.title}</h3>
-          <p class="card-text">${project.text}</p>
-          <span class="card-link">View Project</span>
-        </div>
-      </a>
-    `;
+    <a href="./${p.link}/index.html">
+      <div class="card-icon">
+        <img src="./wp-content/uploads/2024/07/projects/${p.img}" alt="${p.title}">
+      </div>
+      <div class="card-content">
+        <h3 class="card-title">${p.title}</h3>
+        <p class="card-text">${p.text}</p>
+        <span class="card-link">View Project</span>
+      </div>
+    </a>`;
 							return card;
 						}
 
-						projectData.forEach(project => container.appendChild(createCard(project)));
+						/* —— Render cards —— */
+						projectData.forEach(p => container.appendChild(createCard(p)));
 
-						function scrollCards(direction) {
-							const card = container.querySelector('.card');
+						/* —— Arrow scroll —— */
+						function scrollCards(dir) {
+							const card = container.querySelector(".card");
+							if (!card) return;
 							const gap = parseInt(getComputedStyle(container).gap) || 20;
 							const scrollAmount = card.offsetWidth + gap;
-							container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+							container.scrollBy({ left: dir * scrollAmount, behavior: "smooth" });
 						}
+
+						/* Optional: enable wheel‑scroll (shift+wheel or track‑pad) */
+						container.addEventListener("wheel", e => {
+							if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+								container.scrollBy({ left: e.deltaY, behavior: "smooth" });
+								e.preventDefault();
+							}
+						}, { passive: false });
 					</script>
+
 
 					<!-- end of project section  -->
 
