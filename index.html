@@ -1632,12 +1632,14 @@
 						.horizontal-scrolling-cards {
 							display: flex;
 							gap: 20px;
-							overflow-x: auto;
+							overflow-x: auto !important;
 							scroll-snap-type: x mandatory;
 							scroll-behavior: smooth;
 							padding: 0 20px;
 							flex: 1;
 							scrollbar-width: none;
+							touch-action: pan-x;
+							-webkit-overflow-scrolling: touch;
 						}
 
 						.horizontal-scrolling-cards::-webkit-scrollbar {
